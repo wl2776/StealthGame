@@ -11,16 +11,16 @@ AFPSBlackHole::AFPSBlackHole()
 
     MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
     MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    RootComponent = MeshComp;
-
-    inner_sphere = CreateDefaultSubobject<USphereComponent>(TEXT("hole"));
-    inner_sphere->SetSphereRadius(100);
-    inner_sphere->SetupAttachment(MeshComp);
 
     outer_sphere = CreateDefaultSubobject<USphereComponent>(TEXT("field"));
     outer_sphere->SetSphereRadius(15000);
     outer_sphere->SetupAttachment(MeshComp);
 
+    inner_sphere = CreateDefaultSubobject<USphereComponent>(TEXT("hole"));
+    inner_sphere->SetSphereRadius(100);
+    inner_sphere->SetupAttachment(outer_sphere);
+
+    RootComponent = MeshComp;
 }
 
 // Called when the game starts or when spawned
