@@ -19,8 +19,18 @@ AFPSBlackHole::AFPSBlackHole()
     inner_sphere = CreateDefaultSubobject<USphereComponent>(TEXT("hole"));
     inner_sphere->SetSphereRadius(100);
     inner_sphere->SetupAttachment(outer_sphere);
+    inner_sphere->OnComponentBeginOverlap.AddDynamic(this, &AFPSBlackHole::OverlapInnerSphere);
 
     RootComponent = MeshComp;
+}
+
+void AFPSBlackHole::OverlapInnerSphere(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+    int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor) {
+        OtherActor->Destroy();
+    }
+
 }
 
 // Called when the game starts or when spawned
@@ -47,12 +57,12 @@ void AFPSBlackHole::Tick(float delta_time)
         }
     }
 
-    inner_sphere->GetOverlappingComponents(comps);
-    if (comps.Num()) {
-        for (auto& c : comps) {
-            if(c != outer_sphere)
-                c->DestroyComponent(true);
-        }
-    }
+    //inner_sphere->GetOverlappingComponents(comps);
+    //if (comps.Num()) {
+    //    for (auto& c : comps) {
+    //        if(c != outer_sphere)
+    //            c->DestroyComponent(true);
+    //    }
+    //}
 }
 
