@@ -7,16 +7,19 @@
 // Sets default values
 AFPSBlackHole::AFPSBlackHole()
 {
+    PrimaryActorTick.bCanEverTick = true;
+
     MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
     MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     RootComponent = MeshComp;
-    sphere_comp1 = CreateAbstractDefaultSubobject<USphereComponent>(TEXT("sphere"));
 
-    sphere_comp1->SetupAttachment(MeshComp);
-    sphere_comp1->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    sphere_comp1->SetCollisionResponseToAllChannels(ECR_Ignore);
-    sphere_comp1->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-    sphere_comp1->AddForce();
+    inner_sphere = CreateDefaultSubobject<USphereComponent>(TEXT("hole"));
+    inner_sphere->SetSphereRadius(100);
+    inner_sphere->SetupAttachment(MeshComp);
+
+    outer_sphere = CreateDefaultSubobject<USphereComponent>(TEXT("field"));
+    outer_sphere->SetSphereRadius(15000);
+    outer_sphere->SetupAttachment(MeshComp);
 
 }
 
@@ -25,15 +28,31 @@ void AFPSBlackHole::BeginPlay()
 {
     Super::BeginPlay();
     
+    center = GetActorLocation();
 }
 
-
-void AFPSBlackHole::Tick()
+void AFPSBlackHole::Tick(float delta_time)
 {
-    TSet<UPrimitiveComponent *> comps;
-    sphere_comp1->GetOverlappingComponents(comps);
+    Super::Tick(delta_time);
+    TArray<UPrimitiveComponent *> comps;
+    outer_sphere->GetOverlappingComponents(comps);
 
-    for (auto& c : comps) {
-        c->DestroyComponent(true);
+    const float radius = outer_sphere->GetScaledSphereRadius();
+    const float strength = -2000.f;
+
+    if (comps.Num()) {
+        for (auto& c : comps) {
+            if(c->IsSimulatingPhysics())
+                c->AddRadialForce(center, radius, strength, ERadialImpulseFalloff::RIF_Constant, true);
+        }
+    }
+
+    inner_sphere->GetOverlappingComponents(comps);
+    if (comps.Num()) {
+        for (auto& c : comps) {
+            if(c != outer_sphere)
+                c->DestroyComponent(true);
+        }
     }
 }
+

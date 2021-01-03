@@ -17,7 +17,7 @@ public:
     // Sets default values for this actor's properties
     AFPSBlackHole();
 
-    virtual void Tick() override;
+    virtual void Tick(float delta_time) override;
 
 protected:
     // Called when the game starts or when spawned
@@ -27,5 +27,10 @@ protected:
     UStaticMeshComponent* MeshComp;
 
     UPROPERTY(VisibleAnywhere, Category = "Components")
-    USphereComponent* sphere_comp1;
+    USphereComponent* inner_sphere;
+
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    USphereComponent* outer_sphere;
+
+    FVector center;
 };
