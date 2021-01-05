@@ -9,11 +9,16 @@
 UCLASS()
 class AFPSGameMode : public AGameModeBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
 
-	AFPSGameMode();
+    AFPSGameMode();
+
+    void CompleteMission(APawn * InstigatorPawn);
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "GameMode")
+    void OnMissionCompleted(APawn * InstigatorPawn);
 };
 
 
